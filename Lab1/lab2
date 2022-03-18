@@ -16,8 +16,8 @@ namespace ConsoleApp1
     }
     public class Person
     {
-        protected string name;
-        protected int age;
+        protected internal string name;
+        protected internal int age;
         public string Name;
         public int Age;
 
@@ -34,6 +34,10 @@ namespace ConsoleApp1
         {
             Person.name = name;
             Person.age = age;
+        }
+        public override string ToString()
+        {
+            return Person.name; 
         }
     }
     public class Student
