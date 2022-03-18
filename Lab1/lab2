@@ -1,0 +1,84 @@
+using System;
+
+namespace ConsoleApp1
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+           /* Person student1 = new Person("Jan Kowaslski", 21);
+            Person student2 = new Person("Jan Kowaslski", 21);
+            Person student3 = new Person("Jan Kowaslski", 23);
+            Console.WriteLine("student1 == student2: " + student1.Equals(student2)); // Output: student1 == student2: true
+            Console.WriteLine("student1 == student3: " + student1.Equals(student3));
+        */
+        }
+    }
+    public class Person
+    {
+        protected string name;
+        protected int age;
+        public string Name;
+        public int Age;
+
+        public Person(string name, int age)
+        {
+            this.name = name;
+            this.age = age;
+        }
+
+    }
+    public class Teacher
+    {
+        public Teacher(string name, int age) 
+        {
+            Person.name = name;
+            Person.age = age;
+        }
+    }
+    public class Student
+    { 
+        protected string group;
+        //protected List<Tasks>
+        public string Group;
+        public Student(string group)
+        {
+            this.group = group;
+            Group = group;
+        }
+    }
+
+    public class Task
+    {
+        private string name;
+        //taskstatus
+        private enum TaskStatus
+        {
+            Waiting,
+            Progress,
+            Done,
+            Rejected
+        }
+        public string Name;
+        //public taskstatus
+        public Task(string name, string Taskstatus) 
+        {
+            this.name = name;
+           // this.TaskStatus = TaskStatus;
+        }
+    }
+
+    public class Classroom
+    {
+        private string name;
+        // private persons = Person[];
+        public string Name;
+        public Classroom(string name) 
+        {
+            this.name = name;
+            Name = name;
+        }
+    }
+
+
+}
