@@ -1,0 +1,197 @@
+using System;
+using System.Collections.Generic;
+
+namespace Lab02
+{
+
+    public interface ITask
+    {
+        public string Name { get; }
+    }
+
+    public class TaskEventArgs : EventArgs
+    {
+        public ITask Task;
+        public TaskEventArgs(ITask task)
+        {
+            Task = task;
+        }
+    }
+
+    public class PriorityTask : ITask, IEquatable<PriorityTask>
+    {
+        public string Name { get; private set; }
+        public int Priority { get; private set; }
+
+        public PriorityTask()
+        {
+
+        }
+
+        public PriorityTask(string name, int priority)
+        {
+            Name = name;
+            Priority = priority;
+        }
+        public PriorityTask(PriorityTask task)
+        {
+            Name = task.Name;
+            Priority = task.Priority;
+        }
+
+        public override string ToString()
+        {
+            return "{Name: " + Name + "; Priority: " + Priority + "}";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as PriorityTask);
+        }
+        public bool Equals(PriorityTask other)
+        {
+            return this.Priority == other.Priority &&
+                    this.Name == other.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Priority);
+        }
+    }
+
+    public class DescribedTask : PriorityTask, IEquatable<DescribedTask>
+    {
+        public string Description { get; private set; }
+        public DescribedTask()
+        {
+
+        }
+        public DescribedTask(string name, int priority, string description) : base(name, priority)
+        {
+            Description = description;
+        }
+
+        public override string ToString()
+        {
+            return "{Name: " + Name + "; Priority: " + Priority + "; Description: " + Description + "}";
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj is DescribedTask)
+                return this.Equals(obj as DescribedTask);
+            return this.Equals(obj as PriorityTask);
+        }
+
+        public bool Equals(DescribedTask other)
+        {
+            return this.Priority == other.Priority &&
+                    this.Name == other.Name &&
+                    this.Description == other.Description;
+        }
+        public bool Equals(PriorityTask other)
+        {
+            return this.Priority == other.Priority &&
+                    this.Name == other.Name;
+        }
+    }
+
+    public class TasksManager
+    {
+        private List<ITask> waitingTasks = new List<ITask>();
+        private List<ITask> finishedTasks = new List<ITask>();
+
+        public event EventHandler<TaskEventArgs> TaskAdded;
+        public event EventHandler<TaskEventArgs> TaskFinished;
+
+        public void AddTask(string name, int priority)
+        {
+            var task = new PriorityTask(name, priority);
+            waitingTasks.Add(task);
+            TaskAdded.Invoke(this, new TaskEventArgs(task));
+        }
+        public void AddTask(string name, int priority, string description)
+        {
+            var task = new DescribedTask(name, priority, description);
+            waitingTasks.Add(task);
+            TaskAdded.Invoke(this, new TaskEventArgs(task));
+        }
+        public void FinishTask(int index)
+        {
+            if (index > waitingTasks.Count) return;
+            var task = waitingTasks[index];
+            finishedTasks.Add(task);
+            waitingTasks.RemoveAt(index);
+            TaskFinished.Invoke(this, new TaskEventArgs(task));
+        }
+
+        public override string ToString()
+        {
+            string output = "WAITING:";
+            for (int i = 0; i < waitingTasks.Count; i++)
+            {
+                output += $"\n - {i + 1}: {waitingTasks[i].ToString()}";
+            }
+
+            output += "\nFINISHED:";
+            for (int i = 0; i < finishedTasks.Count; i++)
+            {
+                output += $"\n + {i + 1}: {finishedTasks[i].ToString()}";
+            }
+            return output;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            TasksManager tasksManager = new TasksManager();
+            tasksManager.TaskAdded += (object sender, TaskEventArgs e) =>
+            {
+                Console.WriteLine("Task added: " + e.Task.Name);
+            };
+            tasksManager.TaskFinished += (object sender, TaskEventArgs e) =>
+            {
+                Console.WriteLine("Task finished: " + e.Task.Name);
+            };
+            tasksManager.AddTask("Task 3", 1);
+            tasksManager.AddTask("Task 1", 1);
+            tasksManager.AddTask("Task 2", 1);
+            tasksManager.AddTask("Task 4", 1);
+            tasksManager.AddTask("Task 5", 1);
+            tasksManager.AddTask("Task 2", 2, "Description 2");
+            tasksManager.AddTask("Task 1", 2, "Description 1");
+
+            Console.WriteLine(tasksManager);
+
+            Console.WriteLine("-----------------------------------");
+
+            tasksManager.FinishTask(1);
+            tasksManager.FinishTask(0);
+
+            Console.WriteLine(tasksManager);
+        }
+
+    }
+}
+
+/*
+[TestClass]
+public class UnitTest1
+{
+    [TestMethod]
+    public void Test()
+    {
+        object a = new PriorityTask("Task 1", 1);
+        object b = new PriorityTask("Task 1", 1);
+        object c = new DescribedTask("Task 2", 2, "Description 2");
+
+        Assert.AreEqual(a, a);
+        Assert.AreEqual(a, b);
+        Assert.AreNotEqual(c, a);
+        Assert.AreNotEqual(c, b);
+        Assert.AreNotEqual(b, c);
+    }
+}
+*/
