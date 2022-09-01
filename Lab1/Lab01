@@ -1,0 +1,116 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace lab01
+{
+    interface ITask
+    {
+        protected string name { get; set; }
+    }
+
+    class TasksManager
+    {
+        private List<ITask> waitingTasks = new List<ITask>();
+        private List<ITask> finishedTasks = new List<ITask>();
+
+        public void AddTask(string name, int priority)
+        {
+            PriorityTask priorityTask = new PriorityTask(name, priority);
+            waitingTasks.Add(priorityTask);
+        }
+        public void AddTask(string name, int priority, string description)
+        {
+            DescriptionTask descriptionTask = new DescriptionTask(name, priority, description);
+            waitingTasks.Add(descriptionTask);
+        }
+        public void FinishTask(int index)
+        {
+            finishedTasks.Add(waitingTasks[index]);
+            waitingTasks.Remove(waitingTasks[index]);
+        }
+        public override string ToString()
+        {
+            Console.WriteLine("Waiting:");
+            for (int i = 1; i <= waitingTasks.Count(); i++)
+            {
+                Console.WriteLine(i + ": " + "{ " + waitingTasks[i - 1].ToString() + " }");
+            }
+            Console.WriteLine("Finished:");
+            for (int i = 1; i <= finishedTasks.Count(); i++)
+            {
+                Console.WriteLine(i + ": " + "{ " + finishedTasks[i - 1].ToString() + " }");
+            }
+            return "";
+        }
+    }
+
+    class PriorityTask : ITask
+    {
+
+        public string name { get; set; }
+        public int priority { get; set; }
+        string ITask.name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public PriorityTask()
+        {
+        }
+
+        public PriorityTask(string name, int priority)
+        {
+            this.name = name;
+            this.priority = priority;
+        }
+        public PriorityTask(PriorityTask task)
+        {
+            this.name = task.name;
+            this.priority = task.priority;
+        }
+        public override string ToString()
+        {
+            return "Name: " + name + " Priority: " + priority;
+        }
+    }
+
+    class DescriptionTask : PriorityTask
+    {
+        public string description { get; set; }
+
+        public DescriptionTask()
+        {
+        }
+
+        public DescriptionTask(string name, int priority, string description) : base(name, priority)
+        {
+            this.name = name;
+            this.priority = priority;
+            this.description = description;
+        }
+        public override string ToString()
+        {
+            return "Name: " + name + " Priority: " + priority + " Description: " + description;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            TasksManager tasksManager = new TasksManager();
+
+            tasksManager.AddTask("Task 3", 1);
+            tasksManager.AddTask("Task 1", 1);
+            tasksManager.AddTask("Task 2", 1);
+            tasksManager.AddTask("Task 2", 2, "Description 2");
+            tasksManager.AddTask("Task 1", 2, "Description 1");
+
+            Console.WriteLine(tasksManager);
+
+            Console.WriteLine("-----------------------------------");
+
+            tasksManager.FinishTask(1);
+            tasksManager.FinishTask(0);
+
+            Console.WriteLine(tasksManager);
+        }
+    }
+}
